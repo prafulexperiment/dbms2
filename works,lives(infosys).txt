@@ -1,0 +1,55 @@
+-- Create tables
+CREATE TABLE Works (
+    Pname VARCHAR(255),
+    Chame VARCHAR(255),
+    Salary INT
+);
+
+CREATE TABLE Lives (
+    Pname VARCHAR(255),
+    Street VARCHAR(255),
+    City VARCHAR(255)
+);
+
+CREATE TABLE Located_in (
+    Cname VARCHAR(255),
+    City VARCHAR(255)
+);
+
+CREATE TABLE Manager (
+    Pname VARCHAR(255),
+    mgrname VARCHAR(255)
+);
+
+-- Insert sample data
+INSERT INTO Works VALUES ('John', 'Infosys', 40000);
+INSERT INTO Works VALUES ('Alice', 'Wipro', 45000);
+
+INSERT INTO Lives VALUES ('John', '123 Main St', 'Mumbai');
+INSERT INTO Lives VALUES ('Alice', '456 Oak St', 'Bangalore');
+
+INSERT INTO Located_in VALUES ('Infosys', 'Bangalore');
+INSERT INTO Located_in VALUES ('Wipro', 'Chennai');
+
+INSERT INTO Manager VALUES ('John', 'Mary');
+
+-- Queries
+-- i) Find the names of all persons who live in the city 'Mumbai':
+SELECT Pname FROM Lives WHERE City = 'Mumbai';
+
+-- ii) Retrieve the names of all persons of 'Infosys' whose salary is between Rs.30,000 and Rs.50,000:
+SELECT Pname FROM Works WHERE Chame = 'Infosys' AND Salary BETWEEN 30000 AND 50000;
+
+-- iii) Find the names of all persons who live and work in the same city:
+SELECT DISTINCT W.Pname
+FROM Works W
+JOIN Lives L ON W.Pname = L.Pname AND W.City = L.City;
+
+-- iv) List the names of the people who work for 'Wipro' along with the cities they live in:
+SELECT W.Pname, L.City
+FROM Works W
+JOIN Lives L ON W.Pname = L.Pname
+WHERE W.Chame = 'Wipro';
+
+-- v) Find the average salary of all 'Infosyians':
+SELECT AVG(Salary) AS AvgSalary FROM Works WHERE Chame = 'Infosys';

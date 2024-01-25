@@ -1,0 +1,321 @@
+CREATE TABLE DEPARTMENT
+(DNO VARCHAR(20) PRIMARY KEY,
+DNAME VARCHAR(20),
+MGR_SSN VARCHAR(20),
+MGR_START_DATE DATE);
+
+CREATE TABLE EMPLOYEE
+(SSN VARCHAR(20) PRIMARY KEY,
+NAME VARCHAR(20),
+ADDRESS VARCHAR(20),
+SEX CHAR(1),
+SALARY INTEGER,
+SUPERSSN VARCHAR(20),
+DNO VARCHAR(20),
+FOREIGN KEY (SUPERSSN) REFERENCES EMPLOYEE (SSN),
+FOREIGN KEY (DNO) REFERENCES DEPARTMENT (DNO));
+
+ALTER TABLE DEPARTMENT
+ADD FOREIGN KEY (MGR_SSN) REFERENCES EMPLOYEE(SSN);
+
+CREATE TABLE DLOCATION
+(DLOC VARCHAR(20),
+DNO VARCHAR(20),
+FOREIGN KEY (DNO) REFERENCES DEPARTMENT(DNO),
+PRIMARY KEY (DNO, DLOC));
+
+
+CREATE TABLE PROJECT
+(PNO INTEGER PRIMARY KEY,
+PNAME VARCHAR(20),
+PLOCATION VARCHAR(20),
+DNO VARCHAR(20),
+FOREIGN KEY (DNO) REFERENCES DEPARTMENT(DNO));
+
+
+CREATE TABLE WORKS_ON
+(HOURS INTEGER,
+SSN VARCHAR(20),
+PNO INTEGER,
+FOREIGN KEY (SSN) REFERENCES EMPLOYEE(SSN),
+FOREIGN KEY (PNO) REFERENCES PROJECT(PNO),
+PRIMARY KEY (SSN, PNO));
+
+
+
+INSERT INTO EMPLOYEE (SSN, NAME, ADDRESS, SEX, SALARY) VALUES
+ ('ABC01','ANANT SCOTT','BANGALORE','M', 600000);
+INSERT INTO EMPLOYEE (SSN, NAME, ADDRESS, SEX, SALARY) VALUES
+ ('ABC02','PRAFUL','BANGALORE','M', 500000);
+INSERT INTO EMPLOYEE (SSN, NAME, ADDRESS, SEX, SALARY) VALUES
+ ('ABC03','AKARSH','BANGALORE','M', 700000);
+INSERT INTO EMPLOYEE (SSN, NAME, ADDRESS, SEX, SALARY) VALUES
+ ('ABC04','ABHISHEK','MYSORE','M', 500000);
+INSERT INTO EMPLOYEE (SSN, NAME, ADDRESS, SEX, SALARY) VALUES
+ ('ABC05','ANSHUL','MANGALORE','M', 650000);
+
+-- Insert data into DEPARTMENT table
+INSERT INTO DEPARTMENT VALUES ('1','ACCOUNTS','ABC01', '2016-01-03');
+INSERT INTO DEPARTMENT VALUES ('2','IT','ABC02', '2017-02-04');
+INSERT INTO DEPARTMENT VALUES ('3','HR','ABC03', '2016-04-05');
+INSERT INTO DEPARTMENT VALUES ('4','HELPDESK', 'ABC04', '2017-06-03');
+INSERT INTO DEPARTMENT VALUES ('5','SALES','ABC05', '2017-01-08');
+
+-- Insert data into DLOCATION table
+INSERT INTO DLOCATION VALUES ('BENGALURU', '1');
+INSERT INTO DLOCATION VALUES ('BENGALURU', '2');
+INSERT INTO DLOCATION VALUES ('BENGALURU', '3');
+INSERT INTO DLOCATION VALUES ('MYSORE', '4');
+INSERT INTO DLOCATION VALUES ('MYSORE', '5');
+
+-- Insert data into PROJECT table
+INSERT INTO PROJECT VALUES (1000,'IOT','BENGALURU','5');
+INSERT INTO PROJECT VALUES (1001,'CLOUD','BENGALURU','5');
+INSERT INTO PROJECT VALUES (1002,'BIGDATA','BENGALURU','5');
+INSERT INTO PROJECT VALUES (1003,'SENSORS','BENGALURU','3');
+INSERT INTO PROJECT VALUES (1004,'BANK MANAGEMENT','BENGALURU','1');
+
+-- Insert data into WORKS_ON table
+INSERT INTO WORKS_ON VALUES (4, 'ABC02', 1000);
+INSERT INTO WORKS_ON VALUES (6, 'ABC02', 1001);
+INSERT INTO WORKS_ON VALUES (8, 'ABC02', 1002);
+INSERT INTO WORKS_ON VALUES (10,'ABC03', 1000);
+INSERT INTO WORKS_ON VALUES (3, 'ABC05', 1000);
+
+
+SELECT DISTINCT P.PNO
+FROM PROJECT P, DEPARTMENT D, EMPLOYEE E
+WHERE E.DNO=D.DNO
+AND D.MGR_SSN=E.SSN
+AND E.NAME LIKE '%SCOTT'
+UNION
+SELECT DISTINCT P1.PNO
+FROM PROJECT P1, WORKS_ON W, EMPLOYEE E1
+WHERE P1.PNO=W.PNO
+AND E1.SSN=W.SSN
+AND E1.NAME LIKE '%SCOTT';
+
+SELECT E.NAME, 1.1*E.SALARY AS INCR_SAL
+FROM EMPLOYEE E, WORKS_ON W, PROJECT P
+WHERE E.SSN=W.SSN
+AND W.PNO=P.PNO
+AND P.PNAME='IOT';
+
+SELECT SUM(E.SALARY), MAX(E.SALARY), MIN(E.SALARY), AVG(E.SALARY)
+FROM EMPLOYEE E, DEPARTMENT D
+WHERE E.DNO=D.DNO
+AND D.DNAME='ACCOUNTS';
+
+SELECT E.NAME
+FROM EMPLOYEE E
+WHERE NOT EXISTS(SELECT PNO FROM PROJECT WHERE DNO='5' AND PNO NOT IN (SELECT
+PNO FROM WORKS_ON
+WHERE E.SSN=SSN));
+
+
+SELECT D.DNO, COUNT(*)
+FROM DEPARTMENT D, EMPLOYEE E
+WHERE D.DNO=E.DNO
+AND E.SALARY > 600000
+AND D.DNO IN (SELECT E1.DNO
+FROM EMPLOYEE E1
+GROUP BY E1.DNO
+HAVING COUNT(*)>5)
+GROUP BY D.DNO;
+
+
+---------------------------------------------------------------------------------------------------------------------------**********************
+-- Create tables with primary keys
+CREATE TABLE EMPLOYEE (
+    Fname VARCHAR(255),
+    Lname VARCHAR(255),
+    Ssn VARCHAR(255) PRIMARY KEY,
+    Address VARCHAR(255),
+    Super_ssn VARCHAR(255),
+    Salary INT,
+    Dno INT
+);
+
+CREATE TABLE DEPARTMENT (
+    Uname VARCHAR(255),
+    Dnumber INT PRIMARY KEY,
+    Mgr_ssn VARCHAR(255),
+    Mgr_start_date DATE
+);
+
+CREATE TABLE DEPT_LOCATIONS (
+    Dnumber INT PRIMARY KEY,
+    Dlocation VARCHAR(255)
+);
+
+CREATE TABLE PROJECT (
+    Pname VARCHAR(255),
+    Pnumber INT PRIMARY KEY,
+    Plocation VARCHAR(255),
+    Dnum INT,
+    FOREIGN KEY (Dnum) REFERENCES DEPARTMENT(Dnumber)
+);
+
+CREATE TABLE WORKS_ON (
+    Essn VARCHAR(255),
+    Pno INT,
+    Hours INT,
+    PRIMARY KEY (Essn, Pno),
+    FOREIGN KEY (Essn) REFERENCES EMPLOYEE(Ssn),
+    FOREIGN KEY (Pno) REFERENCES PROJECT(Pnumber)
+);
+
+CREATE TABLE DEPENDENT (
+    Essn VARCHAR(255),
+    Dependent_name VARCHAR(255),
+    Sex CHAR(1),
+    Bdate DATE,
+    Relationship VARCHAR(255),
+    PRIMARY KEY (Essn, Dependent_name),
+    FOREIGN KEY (Essn) REFERENCES EMPLOYEE(Ssn)
+);
+
+-- Insert sample data
+INSERT INTO EMPLOYEE VALUES ('John', 'Doe', '111-11-1111', '123 Main St', NULL, 60000, 1);
+INSERT INTO EMPLOYEE VALUES ('Jane', 'Smith', '222-22-2222', '456 Oak St', '111-11-1111', 50000, 2);
+
+INSERT INTO DEPARTMENT VALUES ('HR', 1, '111-11-1111', '2022-01-01');
+INSERT INTO DEPARTMENT VALUES ('IT', 2, '222-22-2222', '2022-01-01');
+
+INSERT INTO DEPT_LOCATIONS VALUES (1, 'New York');
+INSERT INTO DEPT_LOCATIONS VALUES (2, 'San Francisco');
+
+INSERT INTO PROJECT VALUES ('ProjectA', 101, 'New York', 1);
+INSERT INTO PROJECT VALUES ('ProjectB', 102, 'San Francisco', 2);
+
+INSERT INTO WORKS_ON VALUES ('111-11-1111', 101, 40);
+INSERT INTO WORKS_ON VALUES ('222-22-2222', 101, 30);
+INSERT INTO WORKS_ON VALUES ('111-11-1111', 102, 25);
+
+INSERT INTO DEPENDENT VALUES ('111-11-1111', 'Child1', 'M', '2000-01-01', 'Child');
+INSERT INTO DEPENDENT VALUES ('222-22-2222', 'Child2', 'F', '2005-05-05', 'Child');
+
+-- Queries
+-- i) List the names of managers who have at least one dependent
+SELECT E.Fname, E.Lname
+FROM EMPLOYEE E
+WHERE E.Ssn IN (SELECT DISTINCT Mgr_ssn FROM DEPARTMENT WHERE Mgr_ssn IS NOT NULL)
+  AND E.Ssn IN (SELECT DISTINCT Essn FROM DEPENDENT);
+
+-- ii) Retrieve the list of employees and the projects they are working on, ordered by department and, within each department, ordered alphabetically by last name, first name
+SELECT E.Fname, E.Lname, W.Pno
+FROM EMPLOYEE E
+JOIN WORKS_ON W ON E.Ssn = W.Essn
+ORDER BY E.Dno, E.Lname, E.Fname;
+
+-- iii) For each project, retrieve the project number, the project name, and the number of employees who work on that project
+SELECT P.Pnumber, P.Pname, COUNT(W.Essn) AS NumEmployees
+FROM PROJECT P
+LEFT JOIN WORKS_ON W ON P.Pnumber = W.Pno
+GROUP BY P.Pnumber, P.Pname;
+
+-- iv) For each project on which more than two employees work, retrieve the project number, the project name, and the number of employees who work on the project
+SELECT P.Pnumber, P.Pname, COUNT(W.Essn) AS NumEmployees
+FROM PROJECT P
+JOIN WORKS_ON W ON P.Pnumber = W.Pno
+GROUP BY P.Pnumber, P.Pname
+HAVING COUNT(W.Essn) > 2;
+
+-- v) For each project, retrieve the project number, the project name, and the number of employees from department 4 who work on the project
+SELECT P.Pnumber, P.Pname, COUNT(W.Essn) AS NumEmployees
+FROM PROJECT P
+JOIN WORKS_ON W ON P.Pnumber = W.Pno
+JOIN EMPLOYEE E ON W.Essn = E.Ssn
+WHERE E.Dno = 4
+GROUP BY P.Pnumber, P.Pname;
+
+
+-------------------------------------------------------------------*******************************************************************
+
+-- Create tables
+CREATE TABLE EMP (
+    Fname VARCHAR(255),
+    Lname VARCHAR(255),
+    SSN INT PRIMARY KEY,
+    Bdate DATE,
+    Addresses VARCHAR(255),
+    Sex CHAR(1),
+    Salary DECIMAL(10, 2),
+    SuperSSN INT,
+    Dno INT
+);
+
+CREATE TABLE DEPT (
+    Dname VARCHAR(255),
+    Dnumber INT PRIMARY KEY,
+    mgrssn INT,
+    Mgrstartdate DATE
+);
+
+CREATE TABLE DEPT_LOC (
+    Dnumber INT,
+    Dloc VARCHAR(255),
+    PRIMARY KEY (Dnumber, Dloc)
+);
+
+CREATE TABLE PROJECT (
+    Pname VARCHAR(255),
+    Pnumber INT PRIMARY KEY,
+    Dloc VARCHAR(255),
+    Dnum INT
+);
+
+CREATE TABLE WORKS_ON (
+    Essn INT,
+    Pno INT,
+    Hours INT,
+    PRIMARY KEY (Essn, Pno)
+);
+
+-- Insert sample data
+INSERT INTO EMP VALUES ('Alice', 'Smith', 111, '1990-01-01', '123 Main St', 'F', 55000.00, NULL, 20);
+INSERT INTO EMP VALUES ('Bob', 'Johnson', 222, '1985-05-15', '456 Oak St', 'M', 60000.00, 111, 50);
+INSERT INTO EMP VALUES ('Charlie', 'Brown', 333, '1988-12-10', '789 Elm St', 'M', 65000.00, 111, 20);
+
+INSERT INTO DEPT VALUES ('HR', 20, 111, '1990-01-01');
+INSERT INTO DEPT VALUES ('IT', 50, 222, '1985-05-15');
+
+INSERT INTO DEPT_LOC VALUES (20, 'New York');
+INSERT INTO DEPT_LOC VALUES (50, 'San Francisco');
+
+INSERT INTO PROJECT VALUES ('ProjectA', 1, 'New York', 20);
+INSERT INTO PROJECT VALUES ('ProjectB', 2, 'San Francisco', 50);
+
+INSERT INTO WORKS_ON VALUES (111, 1, 20);
+INSERT INTO WORKS_ON VALUES (222, 2, 25);
+INSERT INTO WORKS_ON VALUES (333, 1, 30);
+
+-- Queries
+-- i. List female employees from Dno=20 earning more than 50000
+SELECT * FROM EMP WHERE Sex = 'F' AND Dno = 20 AND Salary > 50000;
+
+-- ii. Retrieve the first name, last name, and salary of all employees who work in department number 50.
+SELECT Fname, Lname, Salary FROM EMP WHERE Dno = 50;
+
+-- iii. Retrieve the name of the manager of each department
+SELECT D.Dname, E.Fname AS ManagerFirstName, E.Lname AS ManagerLastName
+FROM DEPT D
+JOIN EMP E ON D.mgrssn = E.SSN;
+
+-- iv. Retrieve the name and address of all employees who work for the sports department
+SELECT E.Fname, E.Lname, E.Addresses
+FROM EMP E
+JOIN DEPT D ON E.Dno = D.Dnumber
+WHERE D.Dname = 'Sports';
+
+-- v. Retrieve the name of all employees who do not have a supervisor
+SELECT Fname, Lname FROM EMP WHERE SuperSSN IS NULL;
+
+-- vi. Retrieve the SSN of all employees who work on the project no. 1, 2, 3
+SELECT Essn FROM WORKS_ON WHERE Pno IN (1, 2, 3);
+
+-- vii. Retrieve the name of each employee who has a dependent with the same first name and the same sex as the employee
+SELECT DISTINCT E.Fname
+FROM EMP E
+JOIN DEPENDENT D ON E.Fname = D.Dependent_Name AND E.Sex = D.Sex;
+

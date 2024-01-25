@@ -1,0 +1,59 @@
+
+
+CREATE TABLE sailors (
+    sid INT PRIMARY KEY,
+    sname VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE boats (
+    bid INT PRIMARY KEY,
+    bname VARCHAR(255) NOT NULL,
+    color VARCHAR(50) NOT NULL
+);
+
+
+CREATE TABLE reserves (
+    sid INT,
+    bid INT,
+    rdate DATE,
+    FOREIGN KEY (sid) REFERENCES sailors(sid),
+    FOREIGN KEY (bid) REFERENCES boats(bid),
+    PRIMARY KEY (sid, bid, rdate)
+);
+
+
+INSERT INTO sailors (sid, sname) VALUES
+(1, 'Anant'),
+(2, 'Amit'),
+(3, 'akarsh'),
+(4, 'abhishek');
+
+
+INSERT INTO boats (bid, bname, color) VALUES
+(101, 'boat1', 'red'),
+(102, 'boat2', 'blue'),
+(103, 'boat3', 'green'),
+(104, 'boat4', 'red');
+
+
+INSERT INTO reserves (sid, bid, rdate) VALUES
+(1, 101, '2024-01-05'),
+(2, 102, '2024-01-10'),
+(3, 103, '2024-01-15'),
+(4, 104, '2024-01-20');
+
+
+
+SELECT DISTINCT s.sname
+FROM sailors s
+JOIN reserves r ON s.sid = r.sid
+JOIN boats b ON r.bid = b.bid
+WHERE b.color = 'red';
+
+
+SELECT DISTINCT s.sname
+FROM sailors s
+JOIN reserves r ON s.sid = r.sid
+JOIN boats b ON r.bid = b.bid
+WHERE b.color <> 'red' AND s.sname = 'Amit';
